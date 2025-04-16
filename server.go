@@ -15,7 +15,7 @@ import (
 
 // Constants for simulation
 const (
-	G           = 0.0001  // Gravitational constant (tuned for simulation)
+	G           = 1       // Gravitational constant (tuned for simulation)
 	StarMass    = 1000000 // Mass of central star
 	MinDistance = 10      // Minimum distance from star for initial position
 	MaxDistance = 100     // Maximum distance for initial position
@@ -56,11 +56,16 @@ var (
 // Generate random position
 func randomPosition() Vector2 {
 	// Polar coordinates for even distribution
-	theta := rand.Float64() * 2 * math.Pi
+	// theta := rand.Float64() * 2 * math.Pi
 	r := MinDistance + rand.Float64()*(MaxDistance-MinDistance)
-	x := r * math.Cos(theta)
-	y := r * math.Sin(theta)
-	return Vector2{X: x, Y: y}
+	// x := r * math.Cos(theta)
+	// y := r * math.Sin(theta)
+
+	return Vector2{X: r, Y: 0}
+}
+
+func calculateOrbitalVelocity(mass float64, radius float64) float64 {
+	return math.Sqrt((G * mass) / radius)
 }
 
 // Calculate gravitational acceleration
@@ -93,6 +98,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 		Velocity:  Vector2{}, // Start with zero velocity
 		Connected: true,
 	}
+	entity.Velocity.Y = calculateOrbitalVelocity(StarMass, entity.Position.X)
 
 	// Register client
 	clientsMu.Lock()
